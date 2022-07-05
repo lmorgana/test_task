@@ -1,32 +1,39 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "header.hpp"
-#include "sockets.hpp"
+#include "header.h"
+#include "socket.hpp"
 #include "session.hpp"
+#include "FdListener.hpp"
 
-class Session;
+class FdListener;
 
-class Server : public FdHandler {
-	EventSelector	*the_selector;
-	struct item {
-		Session *s;
-		item *next;
-	};
-	item *first;
-    int  fr_port;
+class Server {
+    EventSelector	*the_selector;
+    FdListener      *listener;
+    int             fr_port;
+    std::string     fr_address;
 
-	Server(EventSelector *sel, int fd, char *pass, int fr_port);
+    struct item {
+        PairSession *s;
+        item *next;
+    };
+    item *first;
+
+//    Server() {};
+//    Server(Server &other) {};
+//    Server &operator=(Server &other) {};
+    FdListener *make_listener(int port);
+
 public:
-	~Server();
+    Server(EventSelector *sel, int port, char *fr_address, int fr_port); //forward address and forward port
+    ~Server();
 
-	static Server *Start(EventSelector *sel, int port, char *address, int fr_port);
+    int Start();
 
-    void appendSession(Session *session);
-	void RemoveSession(Session *s, const char *msg);
-
-private:
-	virtual void Handle(bool r, bool w);
+    void JoinPair(int fd);
+    void AppendSession(PairSession *session);
+    void RemoveSession(PairSession *ps);
 };
 
 #endif

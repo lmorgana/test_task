@@ -1,49 +1,46 @@
-#ifndef WEBSERV_SESSION_HPP
-#define WEBSERV_SESSION_HPP
+#ifndef SESSION_HPP
+#define SESSION_HPP
 
-#include "header.hpp"
-#include "sockets.hpp"
-#include "server.hpp"
+#include "header.h"
+#include "socket.hpp"
 
-#define READING 0
-#define WRITING 1
-#define LIMIT_OF_BUFFER 3096
+#define MAX_LEN 8
 
-enum {
-	max_line_length = 512,
-	qlen_for_listen = 16
-};
+class PairSession; // has two active session:  1)our server with client,
+                                            // 2) our server with forward server
 
-class Server;
 
-class Session : FdHandler {
-	friend class Server;
-
-	int		stat;
-	char	buffer[max_line_length+1];	//main buffer
-	int		buf_used;
-	char	*RSbuffer;					//reserve buffer
-	bool	ignoring;
-
-	char	*name;
-    Session *pair;
-
-public:
-    Server	*the_master;
-	Session(Server *a_master, int fd);
-	~Session();
-
-    void set_pair(Session *pr);
-    Session *get_pair();
-	virtual void Handle(bool r, bool w);
-	void send(const char *msg);
-};
-
-class Client : public Session
+class FdSession : public FdHandler
 {
+    PairSession *pair_session;
+
 public:
-    Client(Server *a_master, int fd);
-    Session *connect(void);
+    FdSession(PairSession *a_pair_session, int fd) : pair_session(a_pair_session), FdHandler(fd) {};
+    ~FdSession() {};
+
+    void Handle();
+    void send(const char *msg);
+};
+
+class PairSession
+{
+    FdSession   *client; //FdHandler for client
+    FdSession   *fw_serv;   //FdHandler for server
+//    logg        logg;   //write loggs for all data
+    char buff[MAX_LEN];
+
+    FdSession *makeClient(int fd);
+    FdSession *makeFwServ(char *address);
+
+public:
+    PairSession() : client(nullptr), fw_serv(nullptr) {};
+    PairSession(FdSession *a_client, FdSession *a_fw_serv) : client(a_client), fw_serv(a_fw_serv) {};
+    ~PairSession() {};
+
+    int setConnect(int fd);
+    void forwarding(FdSession *session);
+    FdSession *getClient() { return (client); };
+    FdSession *getFwServer() { return (fw_serv); };
 };
 
 #endif

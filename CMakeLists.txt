@@ -6,10 +6,14 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(.)
 
 add_executable(tz
+        header.h
         main.cpp
         server.cpp
         server.hpp
-        sockets.cpp
-        sockets.hpp
+        socket.cpp
+        socket.hpp
         session.cpp
-        server.hpp)
+        server.hpp
+        FdListener.hpp
+        FdListener.cpp
+        )

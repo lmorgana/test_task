@@ -1,5 +1,5 @@
-#ifndef HEADER_HPP
-#define HEADER_HPP
+#ifndef HEADER_H
+#define HEADER_H
 
 #include <sys/socket.h>
 #include <iostream>
@@ -14,6 +14,6 @@
 #include <string>
 #include <vector>
 
-static const char *EXIT_MSG = "*** someone leave us ***\n";
+#include <arpa/inet.h>
 
 #endif

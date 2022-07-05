@@ -1,91 +1,36 @@
 
 #include "session.hpp"
-#include <cstring>
 
-
-Session::Session(Server *a_master, int fd)
-		: FdHandler(fd, true), stat(READING), buf_used(0), ignoring(false),
-		  name(0), the_master(a_master), pair(nullptr)
-		  {}
-
-Session::~Session()
+int PairSession::setConnect(int fd)
 {
-	if(name)
-		delete[] name;
+    client = this->makeClient(fd);
+    fw_serv = this->makeFwServ(0);
+    if (client && fw_serv)
+        return (1);
+    else
+    {
+        if (client)
+            delete client;
+        if (fw_serv)
+            delete fw_serv;
+        std::cout << "*** we can't connect with server, connection will break ***\n" << std::endl;
+        return (0);
+    }
 }
 
-int get_line(int fd, char *buffer, int len_buffer)
+FdSession *PairSession::makeClient(int fd)
 {
-	char ch;
-	int i = 0;
-	int rc;
-
-	while ((rc = read(fd, &ch, 1)) > 0)
-	{
-		if (i < len_buffer && ch != '\n')
-			buffer[i] = ch;
-		else if (ch == '\n')
-		{
-			buffer[i] = ch;
-			break;
-		}
-		i++;
-	}
-	return (rc);
+    int sd;
+    struct sockaddr_in addr;
+    socklen_t len = sizeof(addr);
+    sd = accept(fd, (struct sockaddr*) &addr, &len);
+    if(sd == -1)
+        return (nullptr);
+    std::cout << "*** client connected with us ***" << std::endl;
+    return (new FdSession(this, sd));
 }
 
-void Session::Handle(bool r, bool w)
-{
-//	std::vector<struct returnRes> *result = new std::vector<struct returnRes>;
-    std::string *result = new std::string("dsf");
-	if (r)
-	{
-		int rc = get_line(GetFd(), buffer, sizeof(buffer));
-		if (rc > 0)
-		{
-//			std::cout << "buffer: \"" << buffer << "\"" << "strlen" << strlen(buffer) << std::endl;
-//			result = checkData(this, buffer, the_master->getBook(), result);
-//			the_master->send_msg(result);
-            this->get_pair()->send(buffer);
-		}
-		else if (rc == 0)
-		{
-			the_master->RemoveSession(this, EXIT_MSG);
-			delete result;
-			return ;
-		}
-		else
-		{
-			the_master->RemoveSession(this, "*** server close session ***");
-			delete result;
-			return ;
-		}
-		bzero(buffer, strlen(buffer));
-		delete result;
-	}
-}
-
-void Session::set_pair(Session *pr)
-{
-    pair = pr;
-}
-
-Session *Session::get_pair()
-{
-    return (pair);
-}
-
-void Session::send(const char *msg)
-{
-	if (msg)
-		write(GetFd(), msg, strlen(msg));
-}
-
-Client::Client(Server *a_master, int fd)
-        : Session(a_master, fd)
-{}
-
-Session *Client::connect(void)
+FdSession *PairSession::makeFwServ(char *address) //adress and port
 {
     int ls, opt, res;
     struct sockaddr_in addr;
@@ -104,7 +49,35 @@ Session *Client::connect(void)
         close(ls);
         return (nullptr);
     }
-    Session *session = new Session(the_master, ls);
-    return (session);
+    std::cout << "*** we connected with server ***\n" << std::endl;
+    return (new FdSession(this, ls));
+}
+
+void PairSession::forwarding(FdSession *session)
+{
+    int rc;
+
+    if (session == getClient())
+    {
+        rc = read(session->GetFd(), buff, MAX_LEN);
+        std::cout << "client pass: " << buff << std::endl;
+        getFwServer()->send(buff);
+        memset(buff, '0', MAX_LEN);
+    }
+    else if (session == getFwServer())
+    {
+
+    }
+}
+
+void FdSession::Handle()
+{
+    pair_session->forwarding(this);
+};
+
+void FdSession::send(const char *msg)
+{
+    if (msg)
+        write(GetFd(), msg, strlen(msg));
 };
 

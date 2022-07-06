@@ -16,4 +16,13 @@
 
 #include <arpa/inet.h>
 
+#include <fstream>
+#include <ctime>
+
+#define MAX_LEN 8
+
+std::string itostr(int time);
+void print_bytes(std::ofstream &file, char *data, int len);
+void print_char(std::ofstream &file, char *data, int len);
+
 #endif

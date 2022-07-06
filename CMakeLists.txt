@@ -20,4 +20,5 @@ add_executable(tz
         EventSelector.hpp
         logg.cpp
         logg.hpp
+        utils.cpp
         )

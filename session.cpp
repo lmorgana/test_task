@@ -57,6 +57,7 @@ FdSession *PairSession::makeFwServ() //adress and port
     if (::connect(ls,  (struct sockaddr*) &addr, sizeof(addr)) != 0)
     {
         //something wrong
+        std::cout << "*** we can't connected with server ***\n" << std::endl;
         close(ls);
         return (nullptr);
     }
@@ -64,16 +65,18 @@ FdSession *PairSession::makeFwServ() //adress and port
     return (new FdSession(this, ls));
 }
 
-int PairSession::transfer(FdSession *sender, FdSession *destination, const char *name)
+int PairSession::transfer(FdSession *sender, FdSession *destination, int is_sender)
 {
     int rc = read(sender->GetFd(), buff, MAX_LEN);
     if (rc > 0)
     {
-        std::cout << name << " pass: " << buff << std::endl;
+//        std::cout << name << " pass: " << buff << std::endl;
         destination->send(buff);
+        logg.make_note(buff, is_sender);
     }
     else if (rc == 0)
     {
+        logg.end();
         the_master->RemovePairSession(this);
         std::cout << "*** user disconnected ***" << std::endl;
         return (0);
@@ -87,9 +90,9 @@ void PairSession::forwarding(FdSession *session)
     FdSession *sender, *destination;
 
     if (session == getClient())
-        transfer(session, getFwServer(), "Client");
+        transfer(session, getFwServer(), 1); // 1 - client >> sender
     else if (session == getFwServer())
-        transfer(session, getClient(), "FwServer");
+        transfer(session, getClient(), 0); // 0 - fwServer >> receive
 }
 
 void FdSession::Handle()

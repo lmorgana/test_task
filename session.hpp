@@ -6,8 +6,6 @@
 #include "server.hpp"
 #include "logg.hpp"
 
-#define MAX_LEN 8
-
 class Server;
 
 class PairSession; // has two active session:  1)our server with client,
@@ -36,7 +34,7 @@ class PairSession
 
     FdSession *makeClient(int fd);
     FdSession *makeFwServ();
-    int transfer(FdSession *sender, FdSession *destination, const char *name);
+    int transfer(FdSession *sender, FdSession *destination, int is_sender);
 public:
     PairSession() : client(nullptr), fw_serv(nullptr) {};
     PairSession(Server *a_master) : the_master(a_master) {};

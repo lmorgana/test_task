@@ -1,18 +1,25 @@
 
 #include "session.hpp"
 
+PairSession::~PairSession()
+{
+    delete client;
+    delete fw_serv;
+}
+
 int PairSession::setConnect(int fd)
 {
     client = this->makeClient(fd);
-    fw_serv = this->makeFwServ(0);
+    fw_serv = this->makeFwServ();
     if (client && fw_serv)
+    {
+        logg.start();
         return (1);
+    }
     else
     {
-        if (client)
-            delete client;
-        if (fw_serv)
-            delete fw_serv;
+        delete client;
+        delete fw_serv;
         std::cout << "*** we can't connect with server, connection will break ***\n" << std::endl;
         return (0);
     }
@@ -24,13 +31,15 @@ FdSession *PairSession::makeClient(int fd)
     struct sockaddr_in addr;
     socklen_t len = sizeof(addr);
     sd = accept(fd, (struct sockaddr*) &addr, &len);
+    logg.setClientAddress(addr.sin_addr);
+    logg.setClientPort(addr.sin_port);
     if(sd == -1)
         return (nullptr);
     std::cout << "*** client connected with us ***" << std::endl;
     return (new FdSession(this, sd));
 }
 
-FdSession *PairSession::makeFwServ(char *address) //adress and port
+FdSession *PairSession::makeFwServ() //adress and port
 {
     int ls, opt, res;
     struct sockaddr_in addr;
@@ -41,8 +50,10 @@ FdSession *PairSession::makeFwServ(char *address) //adress and port
     opt = 1;
     setsockopt(ls, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(6667); // needed to change
+    addr.sin_addr.s_addr = inet_addr(the_master->getFrAddress());
+    addr.sin_port = htons(the_master->getFrPort()); // needed to change
+    logg.setFrAddress(addr.sin_addr);
+    logg.setFrPort(addr.sin_port);
     if (::connect(ls,  (struct sockaddr*) &addr, sizeof(addr)) != 0)
     {
         //something wrong
@@ -53,21 +64,32 @@ FdSession *PairSession::makeFwServ(char *address) //adress and port
     return (new FdSession(this, ls));
 }
 
+int PairSession::transfer(FdSession *sender, FdSession *destination, const char *name)
+{
+    int rc = read(sender->GetFd(), buff, MAX_LEN);
+    if (rc > 0)
+    {
+        std::cout << name << " pass: " << buff << std::endl;
+        destination->send(buff);
+    }
+    else if (rc == 0)
+    {
+        the_master->RemovePairSession(this);
+        std::cout << "*** user disconnected ***" << std::endl;
+        return (0);
+    }
+    memset(buff, '\0', MAX_LEN);
+    return (rc);
+}
+
 void PairSession::forwarding(FdSession *session)
 {
-    int rc;
+    FdSession *sender, *destination;
 
     if (session == getClient())
-    {
-        rc = read(session->GetFd(), buff, MAX_LEN);
-        std::cout << "client pass: " << buff << std::endl;
-        getFwServer()->send(buff);
-        memset(buff, '0', MAX_LEN);
-    }
+        transfer(session, getFwServer(), "Client");
     else if (session == getFwServer())
-    {
-
-    }
+        transfer(session, getClient(), "FwServer");
 }
 
 void FdSession::Handle()

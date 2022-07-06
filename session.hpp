@@ -3,8 +3,12 @@
 
 #include "header.h"
 #include "socket.hpp"
+#include "server.hpp"
+#include "logg.hpp"
 
 #define MAX_LEN 8
+
+class Server;
 
 class PairSession; // has two active session:  1)our server with client,
                                             // 2) our server with forward server
@@ -24,18 +28,19 @@ public:
 
 class PairSession
 {
+    Server      *the_master;
     FdSession   *client; //FdHandler for client
     FdSession   *fw_serv;   //FdHandler for server
-//    logg        logg;   //write loggs for all data
-    char buff[MAX_LEN];
+    Logg        logg;   //write loggs for all data
+    char buff[MAX_LEN + 1];
 
     FdSession *makeClient(int fd);
-    FdSession *makeFwServ(char *address);
-
+    FdSession *makeFwServ();
+    int transfer(FdSession *sender, FdSession *destination, const char *name);
 public:
     PairSession() : client(nullptr), fw_serv(nullptr) {};
-    PairSession(FdSession *a_client, FdSession *a_fw_serv) : client(a_client), fw_serv(a_fw_serv) {};
-    ~PairSession() {};
+    PairSession(Server *a_master) : the_master(a_master) {};
+    ~PairSession();
 
     int setConnect(int fd);
     void forwarding(FdSession *session);

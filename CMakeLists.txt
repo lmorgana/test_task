@@ -16,4 +16,8 @@ add_executable(tz
         server.hpp
         FdListener.hpp
         FdListener.cpp
+        EventSelector.cpp
+        EventSelector.hpp
+        logg.cpp
+        logg.hpp
         )

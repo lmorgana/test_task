@@ -4,6 +4,8 @@
 #include "server.hpp"
 #include "socket.hpp"
 
+class Server;
+
 class FdListener : public FdHandler    //class to listen input port
 {
     Server *the_master;

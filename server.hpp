@@ -2,17 +2,18 @@
 #define SERVER_HPP
 
 #include "header.h"
-#include "socket.hpp"
+#include "EventSelector.hpp"
 #include "session.hpp"
 #include "FdListener.hpp"
 
+class PairSession;
 class FdListener;
 
 class Server {
     EventSelector	*the_selector;
     FdListener      *listener;
     int             fr_port;
-    std::string     fr_address;
+    char            *fr_address;
 
     struct item {
         PairSession *s;
@@ -32,8 +33,10 @@ public:
     int Start();
 
     void JoinPair(int fd);
-    void AppendSession(PairSession *session);
-    void RemoveSession(PairSession *ps);
+    void AppendPairSession(PairSession *session);
+    void RemovePairSession(PairSession *ps);
+    int getFrPort() { return (fr_port); };
+    char *getFrAddress() { return (fr_address); };
 };
 
 #endif

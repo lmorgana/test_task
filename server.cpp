@@ -56,7 +56,7 @@ int Server::Start()
     return (1);
 }
 
-void Server::RemoveSession(PairSession *ps)
+void Server::RemovePairSession(PairSession *ps)
 {
     the_selector->Remove(ps->getClient());
     the_selector->Remove(ps->getFwServer());
@@ -72,7 +72,7 @@ void Server::RemoveSession(PairSession *ps)
     }
 }
 
-void Server::AppendSession(PairSession *ps)
+void Server::AppendPairSession(PairSession *ps)
 {
     item *p = new item;
     p->next = first;
@@ -84,11 +84,12 @@ void Server::AppendSession(PairSession *ps)
 
 void Server::JoinPair(int fd)
 {
-    PairSession *ps = new PairSession();
+    PairSession *ps = new PairSession(this);
 
     if (ps->setConnect(fd) == 0)
     {
         std::cout << "error when make pair session" << std::endl;
     }
-    this->AppendSession(ps);
+    else
+        this->AppendPairSession(ps);
 }

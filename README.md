@@ -1,7 +1,7 @@
 # test_task
 
 It's a proxy server. Just forwarding data from client to server with saving logs.
-My server aren't multithreaded, for tracking events(connect, ready for reading) i'm using poll.
+My server isn't multithreaded, for tracking events(connect, ready for reading) i'm using poll.
 
 1) make
 2) ./tz 8080 127.0.0.1 6667 (./tz listening port, ip address of server to forward, port server to forward)

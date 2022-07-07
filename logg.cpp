@@ -42,10 +42,18 @@ void Logg::start()
                                   + time_file + "-"
                                   + client_address + "(" + client_port + ")-"
                                   + fr_address + "(" + fr_port + ").log";
-
-    std::cout << file_name << std::endl;
+    std::cout << "path to log of this session: ../logs/" << file_name << "\n" << std::endl;
     file.open("../logs/" + file_name, std::ios_base::out);
     file << "Session start\nTime: " << time_file << std::endl;
+
+    std::string backspaces = "Client";
+    backspaces.append(client_address.length() + client_port.length() + 10, ' ');
+    backspaces += "Fw_Server";
+    backspaces.append(fr_address.length() + fr_port.length() - 4, ' ');
+    backspaces += "Bytes";
+    backspaces.append(MAX_LEN * 3 - 1, ' ');
+    backspaces += "Chars\n";
+    file << backspaces;
 }
 
 void Logg::end()

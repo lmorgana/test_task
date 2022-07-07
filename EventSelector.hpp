@@ -4,7 +4,7 @@
 #include "header.h"
 #include "socket.hpp"
 
-class EventSelector {
+class EventSelector{
     typedef std::vector<FdHandler*>::iterator iterator_handler;
     typedef std::vector<pollfd>::iterator iterator_pollfd;
 

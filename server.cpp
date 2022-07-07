@@ -11,15 +11,16 @@ Server::Server(EventSelector *sel, int port, char *fr_address, int fr_port)
 
 Server::~Server()
 {
-    //need to make destructor in the_selector
-//    while(first) {
-//        item *tmp = first;
-//        first = first->next;
-//        the_selector->Remove(tmp->s);
-//        delete tmp->s;
-//        delete tmp;
-//    }
-//    the_selector->Remove(this);
+    the_selector->Remove(listener);
+
+    while(first) {
+        item *tmp = first;
+        first = first->next;
+        the_selector->Remove(tmp->s->getClient());
+        the_selector->Remove(tmp->s->getFwServer());
+        delete tmp->s;
+        delete tmp;
+    }
 }
 
 FdListener *Server::make_listener(int port)
@@ -38,7 +39,7 @@ FdListener *Server::make_listener(int port)
     res = bind(fd, (struct sockaddr*) &addr, sizeof(addr));
     if(res == -1)
         return (nullptr);
-    res = listen(fd, 16); //need to change;
+    res = listen(fd, BACKLOG_LISTEN);
     if(res == -1)
         return (nullptr);
     return (new FdListener(fd, this));
@@ -51,7 +52,7 @@ int Server::Start()
         std::cout << "something wrong" << std::endl;
         return (0);
     }
-    std::cout << "Hello, proxy-server is here, we forwarding data to " << fr_address << ":" << fr_port << std::endl;
+    std::cout << "Hello, proxy-server is here, i'm forwarding data to " << fr_address << "(" << fr_port << ")" << std::endl;
     the_selector->Run();
     return (1);
 }

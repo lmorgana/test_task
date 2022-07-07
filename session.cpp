@@ -18,9 +18,11 @@ int PairSession::setConnect(int fd)
     }
     else
     {
+        if (client)
+            client->send("error: can't connect with forwarding server");
         delete client;
         delete fw_serv;
-        std::cout << "*** we can't connect with server, connection will break ***\n" << std::endl;
+        std::cout << "*** we can't connect with server, connection will break ***" << std::endl;
         return (0);
     }
 }
@@ -39,7 +41,7 @@ FdSession *PairSession::makeClient(int fd)
     return (new FdSession(this, sd));
 }
 
-FdSession *PairSession::makeFwServ() //adress and port
+FdSession *PairSession::makeFwServ()
 {
     int ls, opt, res;
     struct sockaddr_in addr;
@@ -57,11 +59,11 @@ FdSession *PairSession::makeFwServ() //adress and port
     if (::connect(ls,  (struct sockaddr*) &addr, sizeof(addr)) != 0)
     {
         //something wrong
-        std::cout << "*** we can't connected with server ***\n" << std::endl;
+        std::cout << "*** we can't connected with server ***" << std::endl;
         close(ls);
         return (nullptr);
     }
-    std::cout << "*** we connected with server ***\n" << std::endl;
+    std::cout << "*** user connected with fw_server ***" << std::endl;
     return (new FdSession(this, ls));
 }
 
@@ -70,7 +72,6 @@ int PairSession::transfer(FdSession *sender, FdSession *destination, int is_send
     int rc = read(sender->GetFd(), buff, MAX_LEN);
     if (rc > 0)
     {
-//        std::cout << name << " pass: " << buff << std::endl;
         destination->send(buff);
         logg.make_note(buff, is_sender);
     }

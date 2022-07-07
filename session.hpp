@@ -12,7 +12,7 @@ class PairSession; // has two active session:  1)our server with client,
                                             // 2) our server with forward server
 
 
-class FdSession : public FdHandler
+class FdSession : public FdHandler //like one end of the pipe
 {
     PairSession *pair_session;
 
@@ -24,7 +24,7 @@ public:
     void send(const char *msg);
 };
 
-class PairSession
+class PairSession //like pipe between client and fw_server
 {
     Server      *the_master;
     FdSession   *client; //FdHandler for client

@@ -70,7 +70,7 @@ void EventSelector::Run()
     do
     {
         iterator_pollfd iter = poll_array.begin();
-        int res = poll(iter.base(), poll_array.size(), 10000);
+        int res = poll(iter.base(), poll_array.size(), 1000);
         if (res < 0)
         {
             if (errno == EINTR)

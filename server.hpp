@@ -10,10 +10,10 @@ class PairSession;
 class FdListener;
 
 class Server {
-    EventSelector	*the_selector;
-    FdListener      *listener;
-    int             fr_port;
-    char            *fr_address;
+    EventSelector	*the_selector; //contains and listening all ports(sockets) to read
+    FdListener      *listener;  //socket to listening input connection
+    int             fr_port;    //port of fw_server(forward to server)
+    char            *fr_address; //address of fw_server
 
     struct item {
         PairSession *s;
@@ -21,9 +21,6 @@ class Server {
     };
     item *first;
 
-//    Server() {};
-//    Server(Server &other) {};
-//    Server &operator=(Server &other) {};
     FdListener *make_listener(int port);
 
 public:

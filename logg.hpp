@@ -3,7 +3,7 @@
 
 #include "header.h"
 
-class Logg
+class Logg //class to write log_file
 {
 private:
     std::ofstream   file;

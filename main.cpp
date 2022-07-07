@@ -32,19 +32,13 @@ int main(int argc, char **argv)
     }
     int listening_port = atoi(argv[1]);
     int fr_port = atoi(argv[3]);
-    if ((listening_port <= MIN_PORT || listening_port >= MAX_PORT) &&
-        (fr_port <= MIN_PORT || fr_port >= MAX_PORT))
+    if (listening_port <= MIN_PORT || listening_port >= MAX_PORT)
     {
-        std::cout << "Wrong port number: port must be >= " << MIN_PORT << "and <= " << MAX_PORT << std::endl;
+        std::cout << "Wrong port number: port must be >= " << MIN_PORT << " and <= " << MAX_PORT << std::endl;
         return (1);
     }
     EventSelector *selector = new EventSelector;
     Server *serv = new Server(selector, listening_port, argv[2], fr_port);
     serv->Start();
-//    if(!serv) {
-//        perror("server");
-//        return 1;
-//    }
-//    selector->Run();
     return 0;
 }

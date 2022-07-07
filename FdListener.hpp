@@ -6,7 +6,7 @@
 
 class Server;
 
-class FdListener : public FdHandler    //class to listen input port
+class FdListener : public FdHandler    //class to listen input port for input connection
 {
     Server *the_master;
 

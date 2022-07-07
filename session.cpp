@@ -43,7 +43,7 @@ FdSession *PairSession::makeClient(int fd)
 
 FdSession *PairSession::makeFwServ()
 {
-    int ls, opt, res;
+    int ls, opt;
     struct sockaddr_in addr;
 
     ls = socket(AF_INET, SOCK_STREAM, 0);
@@ -88,8 +88,6 @@ int PairSession::transfer(FdSession *sender, FdSession *destination, int is_send
 
 void PairSession::forwarding(FdSession *session)
 {
-    FdSession *sender, *destination;
-
     if (session == getClient())
         transfer(session, getFwServer(), 1); // 1 - client >> sender
     else if (session == getFwServer())

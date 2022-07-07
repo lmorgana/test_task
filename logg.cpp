@@ -1,7 +1,7 @@
 
 #include "logg.hpp"
 
-Logg::Logg() : count_of_byte_receive(0), count_of_byte_send(0)
+Logg::Logg() : count_of_byte_send(0), count_of_byte_receive(0)
 {
     start_time = time(0);
     t_time = localtime(&start_time);

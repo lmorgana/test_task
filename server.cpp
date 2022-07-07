@@ -2,7 +2,7 @@
 #include "server.hpp"
 
 Server::Server(EventSelector *sel, int port, char *fr_address, int fr_port)
-        : the_selector(sel), fr_address(fr_address), fr_port(fr_port)
+        : the_selector(sel), fr_port(fr_port), fr_address(fr_address)
 {
     listener = this->make_listener(port);
     if (listener)

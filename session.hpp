@@ -17,7 +17,7 @@ class FdSession : public FdHandler //like one end of the pipe
     PairSession *pair_session;
 
 public:
-    FdSession(PairSession *a_pair_session, int fd) : pair_session(a_pair_session), FdHandler(fd) {};
+    FdSession(PairSession *a_pair_session, int fd) : FdHandler(fd), pair_session(a_pair_session) {};
     ~FdSession() {};
 
     void Handle();

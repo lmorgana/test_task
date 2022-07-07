@@ -20,8 +20,6 @@ int PairSession::setConnect(int fd)
     {
         if (client)
             client->send("error: can't connect with forwarding server");
-        delete client;
-        delete fw_serv;
         std::cout << "*** we can't connect with server, connection will break ***" << std::endl;
         return (0);
     }
@@ -58,7 +56,6 @@ FdSession *PairSession::makeFwServ()
     logg.setFrPort(addr.sin_port);
     if (::connect(ls,  (struct sockaddr*) &addr, sizeof(addr)) != 0)
     {
-        //something wrong
         std::cout << "*** we can't connected with server ***" << std::endl;
         close(ls);
         return (nullptr);
@@ -77,7 +74,6 @@ int PairSession::transfer(FdSession *sender, FdSession *destination, int is_send
     }
     else if (rc == 0)
     {
-        logg.end();
         the_master->RemovePairSession(this);
         std::cout << "*** user disconnected ***" << std::endl;
         return (0);

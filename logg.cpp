@@ -7,7 +7,7 @@ Logg::Logg() : count_of_byte_send(0), count_of_byte_receive(0)
     t_time = localtime(&start_time);
 }
 
-Logg::~Logg() {}
+Logg::~Logg() { end(); }
 
 void Logg::make_note(char *data, int is_sender) //sender is a flag, if client send message sender=1
 {

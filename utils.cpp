@@ -25,7 +25,7 @@ void print_bytes(std::ofstream &file, char *data, int len)
     file << "|";
     for (int i = 0; i < len; i++)
     {
-        if (isprint(data[i]))
+        if (data[i])
             file << ch_to_unch(data[i]) << " ";
         else
             file << "   ";

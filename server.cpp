@@ -87,10 +87,8 @@ void Server::JoinPair(int fd)
 {
     PairSession *ps = new PairSession(this);
 
-    if (ps->setConnect(fd) == 0)
-    {
-        std::cout << "error when make pair session" << std::endl;
-    }
-    else
+    if (ps->setConnect(fd) != 0)
         this->AppendPairSession(ps);
+    else
+        delete ps;
 }

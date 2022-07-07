@@ -53,7 +53,7 @@ FdSession *PairSession::makeFwServ()
     setsockopt(ls, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = inet_addr(the_master->getFrAddress());
-    addr.sin_port = htons(the_master->getFrPort()); // needed to change
+    addr.sin_port = htons(the_master->getFrPort());
     logg.setFrAddress(addr.sin_addr);
     logg.setFrPort(addr.sin_port);
     if (::connect(ls,  (struct sockaddr*) &addr, sizeof(addr)) != 0)

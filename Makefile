@@ -1,7 +1,7 @@
 NAME            = tz
 SRCS            = main.cpp socket.cpp  server.cpp session.cpp EventSelector.cpp FdListener.cpp logg.cpp utils.cpp
 OBJS            = $(patsubst %.cpp, %.o, $(SRCS))
-HEADERS         = header.h socket.hpp server.hpp session.hpp Eventselector.hpp FdListener.hpp logg.hpp
+HEADERS         = header.h socket.hpp server.hpp session.hpp EventSelector.hpp FdListener.hpp logg.hpp
 CC              = clang++
 RM              = rm -f
 FLAGS           = -Wall -Wextra -Werror
